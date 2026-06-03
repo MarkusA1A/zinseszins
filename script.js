@@ -167,6 +167,13 @@ document.addEventListener('DOMContentLoaded', () => {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 50, // Platz für das Wendepunkt-Label
+                        left: 20,
+                        right: 20
+                    }
+                },
                 plugins: {
                     legend: {
                         position: 'bottom',
@@ -212,9 +219,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                 family: 'IBM Plex Mono',
                                 size: 14
                             },
+                            padding: 10,
                             callback: function(value) {
-                                if (value >= 1000000) return (value / 1000000).toFixed(1) + ' Mio. €';
-                                if (value >= 1000) return (value / 1000).toFixed(0) + 'k €';
+                                if (value === 0) return '0 €';
+                                if (value >= 1000000) return (value / 1000000).toLocaleString('de-DE', {maximumFractionDigits: 1}) + ' Mio. €';
+                                if (value >= 1000) return (value / 1000).toLocaleString('de-DE') + 'k €';
                                 return value + ' €';
                             }
                         }
