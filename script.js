@@ -116,19 +116,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         ctx.setLineDash([6, 6]);
                         ctx.stroke();
 
-                        // Hintergrund für Label (größer und deutlicher)
+                        // Hintergrund für Label (massiv vergrößert für Lesbarkeit)
                         ctx.fillStyle = '#0d6e4f';
-                        ctx.font = 'bold 14px Outfit';
+                        ctx.font = 'bold 20px Outfit';
                         ctx.textAlign = 'center';
                         const text = 'WENDEPUNKT';
                         const textWidth = ctx.measureText(text).width;
                         
-                        // Badge-Hintergrund
-                        ctx.fillRect(xPos - (textWidth/2) - 10, top - 30, textWidth + 20, 24);
+                        // Badge-Hintergrund (extra groß)
+                        ctx.fillRect(xPos - (textWidth/2) - 15, top - 40, textWidth + 30, 32);
                         
-                        // Text
+                        // Text (groß und weiß)
                         ctx.fillStyle = '#ffffff';
-                        ctx.fillText(text, xPos, top - 13);
+                        ctx.fillText(text, xPos, top - 17);
                         ctx.restore();
                     }
                 }
@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ticks: {
                             font: {
                                 family: 'IBM Plex Mono',
-                                size: 11
+                                size: 14
                             },
                             callback: function(value) {
                                 if (value >= 1000000) return (value / 1000000).toFixed(1) + ' Mio. €';
@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ticks: {
                             font: {
                                 family: 'Outfit',
-                                size: 11
+                                size: 14
                             },
                             maxRotation: 0,
                             autoSkip: true,
