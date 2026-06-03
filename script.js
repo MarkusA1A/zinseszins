@@ -116,17 +116,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         ctx.setLineDash([6, 6]);
                         ctx.stroke();
 
-                        // Hintergrund für Label
+                        // Hintergrund für Label (größer und deutlicher)
                         ctx.fillStyle = '#0d6e4f';
-                        ctx.font = 'bold 10px Outfit';
+                        ctx.font = 'bold 14px Outfit';
                         ctx.textAlign = 'center';
                         const text = 'WENDEPUNKT';
                         const textWidth = ctx.measureText(text).width;
                         
-                        ctx.fillRect(xPos - (textWidth/2) - 5, top - 20, textWidth + 10, 15);
+                        // Badge-Hintergrund
+                        ctx.fillRect(xPos - (textWidth/2) - 10, top - 30, textWidth + 20, 24);
                         
+                        // Text
                         ctx.fillStyle = '#ffffff';
-                        ctx.fillText(text, xPos, top - 9);
+                        ctx.fillText(text, xPos, top - 13);
                         ctx.restore();
                     }
                 }
