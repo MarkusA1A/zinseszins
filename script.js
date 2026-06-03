@@ -93,38 +93,45 @@ document.addEventListener('DOMContentLoaded', () => {
             growthChart.destroy();
         }
 
+        const maxYears = labels.length - 1;
+
         // Custom plugin to draw vertical line at turning point
         const verticalLinePlugin = {
             id: 'verticalLine',
-            afterDraw: (chart) => {
-                if (turningPointYear && turningPointYear <= years) {
-                    const ctx = chart.ctx;
-                    const xAxis = chart.scales.x;
-                    const yAxis = chart.scales.y;
-                    const xPos = xAxis.getPixelForValue(turningPointYear);
-                    const topY = yAxis.top;
-                    const bottomY = yAxis.bottom;
+            afterDatasetsDraw: (chart) => {
+                if (turningPointYear && turningPointYear <= maxYears) {
+                    const {ctx, chartArea: {top, bottom, left, right}, scales: {x, y}} = chart;
+                    
+                    // Wir suchen den Index für das Jahr (labels sind "Start", "Jahr 1", "Jahr 2"...)
+                    const xIndex = turningPointYear; // Index 1 ist Jahr 1, da "Start" Index 0 ist
+                    const xPos = x.getPixelForValue(labels[xIndex]);
 
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.moveTo(xPos, topY);
-                    ctx.lineTo(xPos, bottomY);
-                    ctx.lineWidth = 2;
-                    ctx.strokeStyle = '#0d6e4f';
-                    ctx.setLineDash([6, 6]);
-                    ctx.stroke();
+                    if (xPos >= left && xPos <= right) {
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.moveTo(xPos, top);
+                        ctx.lineTo(xPos, bottom);
+                        ctx.lineWidth = 2;
+                        ctx.strokeStyle = '#0d6e4f';
+                        ctx.setLineDash([6, 6]);
+                        ctx.stroke();
 
-                    // Label for the vertical line
-                    ctx.fillStyle = '#0d6e4f';
-                    ctx.font = 'bold 11px Outfit';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('WENDEPUNKT', xPos, topY - 10);
-                    ctx.restore();
+                        // Hintergrund für Label
+                        ctx.fillStyle = '#0d6e4f';
+                        ctx.font = 'bold 10px Outfit';
+                        ctx.textAlign = 'center';
+                        const text = 'WENDEPUNKT';
+                        const textWidth = ctx.measureText(text).width;
+                        
+                        ctx.fillRect(xPos - (textWidth/2) - 5, top - 20, textWidth + 10, 15);
+                        
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillText(text, xPos, top - 9);
+                        ctx.restore();
+                    }
                 }
             }
         };
-
-        const years = labels.length - 1;
 
         growthChart = new Chart(ctx, {
             type: 'line',

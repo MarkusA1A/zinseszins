@@ -43,6 +43,34 @@ h1 {
     font-size: 1.1rem;
     color: var(--text-muted);
     font-weight: 300;
+    margin-bottom: 2rem;
+}
+
+.quote-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1rem;
+    position: relative;
+}
+
+blockquote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    line-height: 1.4;
+}
+
+cite {
+    display: block;
+    font-family: 'Outfit', sans-serif;
+    font-style: normal;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 0.5rem;
+    color: var(--text-muted);
 }
 
 .calculator-grid {
