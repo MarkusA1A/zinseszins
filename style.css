@@ -243,6 +243,17 @@ footer {
     margin: 0 auto;
 }
 
+.footer-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.footer-link:hover {
+    color: var(--primary-color);
+}
+
 .legal-disclaimer {
     margin-top: 0.5rem;
     font-style: italic;
