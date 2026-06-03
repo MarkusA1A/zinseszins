@@ -30,29 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
             investedData.push(totalInvested);
         }
 
-        updateUI(currentBalance, totalInvested, years, totalData, investedData, monthlyContribution);
-        updateChart(labels, totalData, investedData);
-    };
-
-    const updateUI = (total, invested, years, totalData, investedData, monthlyContribution) => {
-        const interest = total - invested;
-        
-        document.getElementById('totalBalance').textContent = formatCurrency(total);
-        document.getElementById('totalInvested').textContent = formatCurrency(invested);
-        document.getElementById('totalInterest').textContent = formatCurrency(interest);
-
-        generateInsights(years, totalData, investedData, monthlyContribution);
-    };
-
-    const generateInsights = (years, totalData, investedData, monthlyContribution) => {
-        const insightsBox = document.getElementById('insightsBox');
-        
-        // Berechnung: Zinsgewinn in den ersten 10 Jahren vs. letzte 10 Jahre (oder halbe Laufzeit)
-        const midPoint = Math.floor(years / 2);
-        const firstHalfInterest = (totalData[midPoint] - investedData[midPoint]);
-        const secondHalfInterest = (totalData[years] - totalData[midPoint]) - (investedData[years] - investedData[midPoint]);
-        
-        // Wann übersteigen die jährlichen Zinsen die jährlichen Einzahlungen?
         let turningPointYear = null;
         const annualContribution = monthlyContribution * 12;
         
@@ -64,6 +41,30 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        updateUI(currentBalance, totalInvested, years, totalData, investedData, monthlyContribution, turningPointYear);
+        updateChart(labels, totalData, investedData, turningPointYear);
+    };
+
+    const updateUI = (total, invested, years, totalData, investedData, monthlyContribution, turningPointYear) => {
+        const interest = total - invested;
+        
+        document.getElementById('totalBalance').textContent = formatCurrency(total);
+        document.getElementById('totalInvested').textContent = formatCurrency(invested);
+        document.getElementById('totalInterest').textContent = formatCurrency(interest);
+
+        generateInsights(years, totalData, investedData, monthlyContribution, turningPointYear);
+    };
+
+    const generateInsights = (years, totalData, investedData, monthlyContribution, turningPointYear) => {
+        const insightsBox = document.getElementById('insightsBox');
+        
+        // Berechnung: Zinsgewinn in den ersten 10 Jahren vs. letzte 10 Jahre (oder halbe Laufzeit)
+        const midPoint = Math.floor(years / 2);
+        const firstHalfInterest = (totalData[midPoint] - investedData[midPoint]);
+        const secondHalfInterest = (totalData[years] - totalData[midPoint]) - (investedData[years] - investedData[midPoint]);
+        
+        const annualContribution = monthlyContribution * 12;
+
         let html = `<span class="insight-title">Analyse des Zinseszins-Effekts</span>`;
         
         if (years >= 10) {
@@ -72,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (turningPointYear) {
-            html += `<p class="insight-text" style="margin-top: 0.8rem;">Der "Wendepunkt": Ab **Jahr ${turningPointYear}** verdienen Ihre Zinsen jährlich mehr Geld (<span class="highlight-val">> ${formatCurrency(annualContribution)}</span>) als Sie selbst aktiv einzahlen.</p>`;
+            html += `<p class="insight-text" style="margin-top: 0.8rem;">Der markierte **Wendepunkt**: Ab **Jahr ${turningPointYear}** verdienen Ihre Zinsen jährlich mehr Geld (<span class="highlight-val">> ${formatCurrency(annualContribution)}</span>) als Sie selbst aktiv einzahlen.</p>`;
         } else {
             html += `<p class="insight-text" style="margin-top: 0.8rem;">Hinweis: Bei dieser Konfiguration wird die volle Dynamik des Zinseszinses erst bei längeren Laufzeiten oder höheren Raten sichtbar.</p>`;
         }
@@ -87,13 +88,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }).format(value);
     };
 
-    const updateChart = (labels, totalData, investedData) => {
+    const updateChart = (labels, totalData, investedData, turningPointYear) => {
         if (growthChart) {
             growthChart.destroy();
         }
 
+        // Custom plugin to draw vertical line at turning point
+        const verticalLinePlugin = {
+            id: 'verticalLine',
+            afterDraw: (chart) => {
+                if (turningPointYear && turningPointYear <= years) {
+                    const ctx = chart.ctx;
+                    const xAxis = chart.scales.x;
+                    const yAxis = chart.scales.y;
+                    const xPos = xAxis.getPixelForValue(turningPointYear);
+                    const topY = yAxis.top;
+                    const bottomY = yAxis.bottom;
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(xPos, topY);
+                    ctx.lineTo(xPos, bottomY);
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = '#0d6e4f';
+                    ctx.setLineDash([6, 6]);
+                    ctx.stroke();
+
+                    // Label for the vertical line
+                    ctx.fillStyle = '#0d6e4f';
+                    ctx.font = 'bold 11px Outfit';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('WENDEPUNKT', xPos, topY - 10);
+                    ctx.restore();
+                }
+            }
+        };
+
+        const years = labels.length - 1;
+
         growthChart = new Chart(ctx, {
             type: 'line',
+            plugins: [verticalLinePlugin],
             data: {
                 labels: labels,
                 datasets: [
