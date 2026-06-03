@@ -30,16 +30,54 @@ document.addEventListener('DOMContentLoaded', () => {
             investedData.push(totalInvested);
         }
 
-        updateUI(currentBalance, totalInvested);
+        updateUI(currentBalance, totalInvested, years, totalData, investedData, monthlyContribution);
         updateChart(labels, totalData, investedData);
     };
 
-    const updateUI = (total, invested) => {
+    const updateUI = (total, invested, years, totalData, investedData, monthlyContribution) => {
         const interest = total - invested;
         
         document.getElementById('totalBalance').textContent = formatCurrency(total);
         document.getElementById('totalInvested').textContent = formatCurrency(invested);
         document.getElementById('totalInterest').textContent = formatCurrency(interest);
+
+        generateInsights(years, totalData, investedData, monthlyContribution);
+    };
+
+    const generateInsights = (years, totalData, investedData, monthlyContribution) => {
+        const insightsBox = document.getElementById('insightsBox');
+        
+        // Berechnung: Zinsgewinn in den ersten 10 Jahren vs. letzte 10 Jahre (oder halbe Laufzeit)
+        const midPoint = Math.floor(years / 2);
+        const firstHalfInterest = (totalData[midPoint] - investedData[midPoint]);
+        const secondHalfInterest = (totalData[years] - totalData[midPoint]) - (investedData[years] - investedData[midPoint]);
+        
+        // Wann übersteigen die jährlichen Zinsen die jährlichen Einzahlungen?
+        let turningPointYear = null;
+        const annualContribution = monthlyContribution * 12;
+        
+        for (let i = 1; i <= years; i++) {
+            const annualInterest = (totalData[i] - totalData[i-1]) - (investedData[i] - investedData[i-1]);
+            if (annualInterest > annualContribution) {
+                turningPointYear = i;
+                break;
+            }
+        }
+
+        let html = `<span class="insight-title">Analyse des Zinseszins-Effekts</span>`;
+        
+        if (years >= 10) {
+            html += `<p class="insight-text">Geduld zahlt sich aus: In den ersten ${midPoint} Jahren beträgt Ihr Zinsertrag nur <span class="highlight-val">${formatCurrency(firstHalfInterest)}</span>. 
+            In der zweiten Hälfte der Laufzeit explodiert dieser auf <span class="highlight-val">${formatCurrency(secondHalfInterest)}</span> &ndash; ein Zuwachs um das <span class="highlight-val">${(secondHalfInterest/firstHalfInterest).toFixed(1)}</span>-fache.</p>`;
+        }
+
+        if (turningPointYear) {
+            html += `<p class="insight-text" style="margin-top: 0.8rem;">Der "Wendepunkt": Ab **Jahr ${turningPointYear}** verdienen Ihre Zinsen jährlich mehr Geld (<span class="highlight-val">> ${formatCurrency(annualContribution)}</span>) als Sie selbst aktiv einzahlen.</p>`;
+        } else {
+            html += `<p class="insight-text" style="margin-top: 0.8rem;">Hinweis: Bei dieser Konfiguration wird die volle Dynamik des Zinseszinses erst bei längeren Laufzeiten oder höheren Raten sichtbar.</p>`;
+        }
+
+        insightsBox.innerHTML = html;
     };
 
     const formatCurrency = (value) => {

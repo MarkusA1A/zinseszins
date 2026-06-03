@@ -172,6 +172,33 @@ button:hover {
 .chart-container {
     height: 400px;
     width: 100%;
+    margin-bottom: 2rem;
+}
+
+.insights-box {
+    background-color: var(--accent-bg);
+    border-left: 4px solid var(--primary-color);
+    padding: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.insight-title {
+    font-weight: 600;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.insight-text {
+    color: var(--text-color);
+}
+
+.highlight-val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
 }
 
 footer {
